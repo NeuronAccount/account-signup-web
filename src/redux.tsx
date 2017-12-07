@@ -1,7 +1,9 @@
 import { AnyAction, combineReducers } from 'redux';
+import { DefaultApiFactory } from './api/account/gen/api';
+
+let accountApi = DefaultApiFactory(fetch, 'http://127.0.0.1:8083/private-api/v1/accounts' );
 
 export interface RootState {
-    hello: string;
 }
 
 export interface ApiError {
@@ -50,10 +52,61 @@ export function errorFromResponse(response: {}): Promise<ApiError> {
     }
 }
 
-function hello(hello:string,action:AnyAction):string {
-    return 'hello'
+export interface SmsCodeParams {
+    scene: string;
+    phone: string;
+    captchaId?: string;
+    captchaCode?: string;
+}
+export const SMS_CODE_REQUEST = 'SMS_CODE_REQUEST';
+export const SMS_CODE_SUCCESS = 'SMS_CODE_SUCCESS';
+export const SMS_CODE_FAILURE = 'SMS_CODE_FAILURE';
+export function apiSmsCode(params: SmsCodeParams,
+                           onSuccess: () => void,
+                           onError: (err: ApiError) => void): (dispatch: (action: AnyAction) => void) => void {
+    console.log('apiSmsCode', params);
+    return function (dispatch: (action: AnyAction) => void) {
+        dispatch({type: SMS_CODE_REQUEST});
+        return accountApi.smsCode(params).then(() => {
+            dispatch({type: SMS_CODE_SUCCESS});
+            onSuccess();
+        }).catch((response) => {
+            errorFromResponse(response).then((err) => {
+                dispatchResponseError(dispatch, SMS_CODE_FAILURE, errorFromResponse(err));
+                onError(err);
+            });
+        });
+    };
+}
+
+export interface SmsSignupParams {
+    phone: string;
+    smsCode: string;
+    password: string;
+}
+export const SMS_SIGNUP_REQUEST = 'SMS_SIGNUP_REQUEST';
+export const SMS_SIGNUP_SUCCESS = 'SMS_SIGNUP_SUCCESS';
+export const SMS_SIGNUP_FAILURE = 'SMS_SIGNUP_FAILURE';
+export function apiSmsSignup(params: SmsSignupParams,
+                             onSuccess: (jwt: string) => void,
+                             onError: (err: ApiError) => void): (dispatch: (action: AnyAction) => void) => void {
+    console.log('apiSmsSignup', params);
+    return function (dispatch: (action: AnyAction) => void ) {
+        dispatch({type: SMS_SIGNUP_REQUEST});
+        return accountApi.smsSignup(params)
+            .then((data) => {
+                dispatch({type: SMS_SIGNUP_SUCCESS, payload: data});
+                onSuccess(data);
+            })
+            .catch((response) => {
+                errorFromResponse(response).then((err) => {
+                    dispatchResponseError(dispatch, SMS_SIGNUP_FAILURE, err);
+                    onError(err);
+                });
+            });
+    };
 }
 
 export const rootReducer = combineReducers({
-    hello
+
 });
