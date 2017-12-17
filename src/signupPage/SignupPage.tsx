@@ -1,24 +1,22 @@
 import * as React from 'react';
 import { TextField } from 'material-ui';
-import { AnyAction } from 'redux';
 import Button from 'material-ui/Button';
 import { connect } from 'react-redux';
-import { ApiError, apiSmsCode, apiSmsSignup, RootState, SmsCodeParams, SmsSignupParams } from '../redux';
+import { apiSmsCode, apiSmsSignup, RootState } from '../redux';
+import { SmsCodeParams, SmsSignupParams } from '../api/account-private/gen/api';
+import TimedText, { TextTimestamp } from '../_common/TimedText';
+import { Dispatchable } from '../_common/action';
 
 interface Props {
-    apiSmsCode: (params: SmsCodeParams,
-                 onSuccess: () => void,
-                 onError: (err: ApiError) => void) => (dispatch: (action: AnyAction) => void) => void;
-    apiSmsSignup: (params: SmsSignupParams,
-                   onSuccess: (jwt: string) => void,
-                   onError: (err: ApiError) => void) => (dispatch: (action: AnyAction) => void) => void;
+    errorMessage: TextTimestamp;
+    smsCodeSentMessage: TextTimestamp;
+
+    apiSmsCode: (params: SmsCodeParams) => Dispatchable;
+    apiSmsSignup: (params: SmsSignupParams) => Dispatchable;
 }
 
 interface State {
-    queryParams: Map<string, string>;
-    inputError: string;
-    inputErrorTimer: number;
-    inputErrorNotifyStartTime: Date;
+    errorMessage: TextTimestamp;
     signupPhone: string;
     signupSmsCode: string;
     signupPassword: string;
@@ -26,57 +24,23 @@ interface State {
 
 class SignupPage extends React.Component<Props, State> {
     componentWillMount() {
-        let queryParamsMap = new Map<string, string>();
-        if (window.location.search.startsWith('?')) {
-            window.location.search.substring(1).split('&').forEach((pair) => {
-                const tokens = pair.split('=');
-                if (tokens.length > 1) {
-                    queryParamsMap.set(tokens[0], tokens[1]);
-                } else {
-                    queryParamsMap.set(tokens[0], '');
-                }
-            });
-        }
-
         this.setState({
-            queryParams: queryParamsMap,
-            inputError: '',
+            errorMessage: {text: '', timestamp: new Date()},
             signupPhone: '',
             signupSmsCode: '',
             signupPassword: ''
         });
-
-        this.onLoginSuccess = this.onLoginSuccess.bind(this);
-        this.onApiError = this.onApiError.bind(this);
     }
 
-    onLoginInputError(message: string) {
-        if (this.state.inputErrorTimer != null) {
-            clearInterval(this.state.inputErrorTimer);
+    componentWillReceiveProps(nextProps: Props) {
+        if (nextProps.errorMessage.text !== this.props.errorMessage.text
+            || nextProps.errorMessage.timestamp !== this.props.errorMessage.timestamp) {
+            this.setState({errorMessage: nextProps.errorMessage});
         }
-
-        this.setState({inputError: message, inputErrorNotifyStartTime: new Date()});
-
-        if (message == null || message === '') {
-            return;
-        }
-
-        let t: number = window.setInterval(() => {
-            if (new Date().getTime() - this.state.inputErrorNotifyStartTime.getTime() > 3000) {
-                this.setState({inputError: ''});
-                clearInterval(t);
-            }
-        },                                 200);
-
-        this.setState({inputErrorTimer: t});
     }
 
-    onLoginSuccess(jwt: string) {
-        console.log('onLoginSuccess', jwt);
-    }
-
-    onApiError(err: ApiError) {
-        this.onLoginInputError(err.message);
+    onError(message: string) {
+        this.setState({errorMessage: {text: message, timestamp: new Date()}});
     }
 
     renderSmsSignup() {
@@ -111,20 +75,24 @@ class SignupPage extends React.Component<Props, State> {
                             this.setState({signupSmsCode: e.target.value});
                         }}
                     />
+                    <div style={{height: '20px'}}>
+                        {
+                            this.props.smsCodeSentMessage &&
+                            <TimedText
+                                text={this.props.smsCodeSentMessage}
+                                intervalMillSec={3000}
+                                style={{fontSize: 'x-small', color: '#BBB', float: 'right'}}
+                            />
+                        }
+                    </div>
                     <Button
-                        style={{float: 'right', marginTop: '30px', backgroundColor: '#86ce2f', color: '#FFF'}}
+                        style={{float: 'right', marginTop: '10px', backgroundColor: '#86ce2f', color: '#FFF'}}
                         onClick={() => {
                             if (this.state.signupPhone == null || this.state.signupPhone === '') {
-                                return this.onLoginInputError('！请输入手机号');
+                                return this.onError('！请输入手机号');
                             }
 
-                            this.props.apiSmsCode({scene: 'SMS_SIGNUP', phone: this.state.signupPhone},
-                                                  () => {
-                                    console.log('success');
-                                },
-                                                  (err) => {
-                                    this.onLoginInputError(err.message);
-                                });
+                            this.props.apiSmsCode({scene: 'SMS_SIGNUP', phone: this.state.signupPhone});
                         }}
                     >
                         发送短信验证码
@@ -134,24 +102,22 @@ class SignupPage extends React.Component<Props, State> {
                     style={{backgroundColor: '#86ce2f', color: '#FFF', width: '100%', marginTop: '20px'}}
                     onClick={() => {
                         if (this.state.signupPhone == null || this.state.signupPhone === '') {
-                            return this.onLoginInputError('！请输入手机号');
+                            return this.onError('！请输入手机号');
                         }
 
                         if (this.state.signupPassword == null || this.state.signupPassword === '') {
-                            return this.onLoginInputError('！请输入密码');
+                            return this.onError('！请输入密码');
                         }
 
                         if (this.state.signupSmsCode == null || this.state.signupSmsCode === '') {
-                            return this.onLoginInputError('！请输入验证码');
+                            return this.onError('！请输入验证码');
                         }
 
                         this.props.apiSmsSignup({
-                                phone: this.state.signupPhone,
-                                smsCode: this.state.signupSmsCode,
-                                password: this.state.signupPassword
-                            },
-                                                this.onLoginSuccess,
-                                                this.onApiError);
+                            phone: this.state.signupPhone,
+                            smsCode: this.state.signupSmsCode,
+                            password: this.state.signupPassword
+                        });
                     }}
                 >
                     <label style={{fontSize: 'large'}}>注 册</label>
@@ -190,13 +156,17 @@ class SignupPage extends React.Component<Props, State> {
                         marginTop: '100px',
                     }}
                 >
-
-                    <div style={{marginTop: '40px'}}>
-                        <div style={{marginTop: '5px', height: '10px'}}>
-                            <label style={{fontSize: '50%', color: 'red'}}>{this.state.inputError}</label>
-                        </div>
-                        {this.renderSmsSignup()}
+                    <div style={{height: '10px'}}>
+                        {
+                            this.state.errorMessage &&
+                            <TimedText
+                                text={this.state.errorMessage}
+                                intervalMillSec={3000}
+                                style={{fontSize: '50%', color: 'red'}}
+                            />
+                        }
                     </div>
+                    {this.renderSmsSignup()}
                 </div>
             </div>
         );
@@ -204,7 +174,10 @@ class SignupPage extends React.Component<Props, State> {
 }
 
 function selectProps(state: RootState) {
-    return {};
+    return {
+        errorMessage: state.errorMessage,
+        smsCodeSentMessage: state.smsCodeSentMessage,
+    };
 }
 
 export default connect(
