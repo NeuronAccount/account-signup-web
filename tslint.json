@@ -1,5 +1,5 @@
 {
-    "extends": ["tslint-react"],
+    "extends": ["tslint:latest"],
     "rules": {
         "align": [
             true,
@@ -94,6 +94,10 @@
             "check-separator",
             "check-type",
             "check-typecast"
-        ]
+        ],
+        "object-literal-sort-keys":false,
+        "no-implicit-dependencies":false,
+        "no-reference": false,
+        "no-var-requires": false
     }
 }

@@ -1,18 +1,17 @@
+import { Button, TextField } from 'material-ui';
 import * as React from 'react';
-import { TextField } from 'material-ui';
-import Button from 'material-ui/Button';
 import { connect } from 'react-redux';
-import { apiSmsCode, apiSmsSignup, RootState } from '../redux';
-import { SmsCodeParams, SmsSignupParams } from '../api/account-private/gen/api';
-import TimedText, { TextTimestamp } from '../_common/TimedText';
 import { Dispatchable } from '../_common/action';
+import TimedText, { TextTimestamp } from '../_common/TimedText';
+import { smsCodeParams, smsSignupParams } from '../api/account-private/gen';
+import { apiSmsCode, apiSmsSignup, RootState } from '../redux';
 
 interface Props {
     errorMessage: TextTimestamp;
     smsCodeSentMessage: TextTimestamp;
 
-    apiSmsCode: (params: SmsCodeParams) => Dispatchable;
-    apiSmsSignup: (params: SmsSignupParams) => Dispatchable;
+    apiSmsCode: (params: smsCodeParams) => Dispatchable;
+    apiSmsSignup: (params: smsSignupParams) => Dispatchable;
 }
 
 interface State {
@@ -23,7 +22,7 @@ interface State {
 }
 
 class SignupPage extends React.Component<Props, State> {
-    componentWillMount() {
+    public componentWillMount() {
         this.setState({
             errorMessage: {text: '', timestamp: new Date()},
             signupPhone: '',
@@ -32,18 +31,18 @@ class SignupPage extends React.Component<Props, State> {
         });
     }
 
-    componentWillReceiveProps(nextProps: Props) {
+    public componentWillReceiveProps(nextProps: Props) {
         if (nextProps.errorMessage.text !== this.props.errorMessage.text
             || nextProps.errorMessage.timestamp !== this.props.errorMessage.timestamp) {
             this.setState({errorMessage: nextProps.errorMessage});
         }
     }
 
-    onError(message: string) {
+    public onError(message: string) {
         this.setState({errorMessage: {text: message, timestamp: new Date()}});
     }
 
-    renderSmsSignup() {
+    public renderSmsSignup() {
         return (
             <div>
                 <TextField
@@ -126,7 +125,7 @@ class SignupPage extends React.Component<Props, State> {
         );
     }
 
-    render() {
+    public render() {
         return (
             <div>
                 <div
@@ -183,4 +182,4 @@ function selectProps(state: RootState) {
 export default connect(
     selectProps, {
     apiSmsCode,
-    apiSmsSignup})( SignupPage);
+    apiSmsSignup})(SignupPage);
