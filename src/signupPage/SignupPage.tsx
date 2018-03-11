@@ -103,9 +103,12 @@ class SignupPage extends React.Component<Props, State> {
             return null;
         }
 
+        const {text, timestamp} = errorMessage;
+
         return (
             <TimedText
-                text={errorMessage}
+                text={text}
+                timestamp={timestamp}
                 intervalMillSec={3000}
                 style={{fontSize: '50%', color: 'red'}}
             />
@@ -147,7 +150,9 @@ class SignupPage extends React.Component<Props, State> {
         return (
             <div>
                 {this.renderSmsCode()}
-                {this.renderSmsCodeSentMessage()}
+                <div style={{height: '20px'}}>
+                    {this.renderSmsCodeSentMessage()}
+                </div>
                 {this.renderSendSmsCodeButton()}
             </div>
         );
@@ -170,17 +175,20 @@ class SignupPage extends React.Component<Props, State> {
     }
 
     private renderSmsCodeSentMessage() {
+        const {smsCodeSentMessage} = this.props;
+        if (!smsCodeSentMessage) {
+            return null;
+        }
+
+        const {text, timestamp} = smsCodeSentMessage;
+
         return (
-            <div style={{height: '20px'}}>
-                {
-                    this.props.smsCodeSentMessage &&
-                    <TimedText
-                        text={this.props.smsCodeSentMessage}
-                        intervalMillSec={3000}
-                        style={{fontSize: 'x-small', color: '#BBB', float: 'right'}}
-                    />
-                }
-            </div>
+            <TimedText
+                text={text}
+                timestamp={timestamp}
+                intervalMillSec={3000}
+                style={{fontSize: 'x-small', color: '#BBB', float: 'right'}}
+            />
         );
     }
 
