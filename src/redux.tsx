@@ -57,7 +57,7 @@ const smsCodeSentMessage = (state: TextTimestamp = initErrorMessage, action: Sta
     }
 };
 
-export const rootReducer = combineReducers({
+export const rootReducer = combineReducers<RootState>({
     errorMessage,
     smsCodeSentMessage,
 });
