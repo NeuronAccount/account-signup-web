@@ -30,19 +30,14 @@ const initialState = {
 class SignupPage extends React.Component<Props, State> {
     private static renderTitle() {
         return (
-            <div
-                style={{
-                    width: '100%',
-                    height: '48px',
-                    backgroundColor: '#444'
-                }}
-            >
+            <div style={{width: '100%', height: '48px', backgroundColor: '#444'}}>
                 <label
                     style={{
                         display: 'block',
-                        textAlign: 'center',
+                        textAlign: 'left',
                         color: '#FFF',
-                        fontSize: '200%'
+                        fontSize: '200%',
+                        marginLeft: '8px'
                     }}
                 >
                     注册火星帐号
@@ -72,7 +67,11 @@ class SignupPage extends React.Component<Props, State> {
 
     public render() {
         return (
-            <div>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
                 {SignupPage.renderTitle()}
                 {this.renderContent()}
             </div>
@@ -81,14 +80,7 @@ class SignupPage extends React.Component<Props, State> {
 
     private renderContent() {
         return (
-            <div
-                style={{
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                    width: '300px',
-                    marginTop: '48px',
-                }}
-            >
+            <div style={{width: '300px', marginTop: '24px'}}>
                 <div style={{height: '10px'}}>
                     {this.renderErrorMessage()}
                 </div>
@@ -187,7 +179,7 @@ class SignupPage extends React.Component<Props, State> {
                 text={text}
                 timestamp={timestamp}
                 intervalMillSec={3000}
-                style={{fontSize: 'x-small', color: '#BBB', float: 'right'}}
+                style={{fontSize: 'x-small', color: '#888', float: 'right'}}
             />
         );
     }
@@ -195,7 +187,16 @@ class SignupPage extends React.Component<Props, State> {
     private renderSendSmsCodeButton() {
         return (
             <Button
-                style={{float: 'right', marginTop: '10px', backgroundColor: '#86ce2f', color: '#FFF'}}
+                style={{
+                    backgroundColor: '#0088FF',
+                    float: 'right',
+                    marginTop: '10px',
+                    color: '#fff',
+                    borderStyle: 'solid',
+                    borderWidth: '1px',
+                    borderRadius: '8px',
+                    borderColor: '#eee'
+                }}
                 onClick={this.onSendSmsCodeButtonClick}
             >
                 发送短信验证码
@@ -232,7 +233,18 @@ class SignupPage extends React.Component<Props, State> {
     private renderSignupButton() {
         return (
             <Button
-                style={{backgroundColor: '#86ce2f', color: '#FFF', width: '100%', marginTop: '20px'}}
+                style={{
+                    backgroundColor: '#0088FF',
+                    fontSize: '150%',
+                    color: '#fff',
+                    width: '100%',
+                    marginTop: '10px',
+                    height: '48px',
+                    borderStyle: 'solid',
+                    borderWidth: '1px',
+                    borderRadius: '8px',
+                    borderColor: '#eee'
+                }}
                 onClick={this.onSignupButtonClick}
             >
                 <label style={{fontSize: 'large'}}>注 册</label>
