@@ -102,7 +102,7 @@ class SignupPage extends React.Component<Props, State> {
                 text={text}
                 timestamp={timestamp}
                 intervalMillSec={3000}
-                style={{fontSize: '50%', color: 'red'}}
+                style={{fontSize: '14px', color: 'red'}}
             />
         );
     }
@@ -179,7 +179,7 @@ class SignupPage extends React.Component<Props, State> {
                 text={text}
                 timestamp={timestamp}
                 intervalMillSec={3000}
-                style={{fontSize: 'x-small', color: '#888', float: 'right'}}
+                style={{fontSize: '14px', color: '#BBB', float: 'right'}}
             />
         );
     }
