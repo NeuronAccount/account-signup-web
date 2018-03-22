@@ -2,6 +2,8 @@ import { Button, TextField } from 'material-ui';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatchable } from '../_common/action';
+import { checkPhone } from '../_common/common';
+import { countdown } from '../_common/countdown';
 import TimedText, { TextTimestamp } from '../_common/TimedText';
 import { smsCodeParams, smsSignupParams } from '../api/account-private/gen';
 import { apiSmsCode, apiSmsSignup, RootState } from '../redux';
@@ -19,12 +21,14 @@ interface State {
     signupPhone: string;
     signupSmsCode: string;
     signupPassword: string;
+    smsCodeCountdown: number;
 }
 const initialState = {
     errorMessage: {text: '', timestamp: new Date()},
     signupPhone: '',
     signupSmsCode: '',
-    signupPassword: ''
+    signupPassword: '',
+    smsCodeCountdown: 0
 };
 
 class SignupPage extends React.Component<Props, State> {
@@ -185,21 +189,27 @@ class SignupPage extends React.Component<Props, State> {
     }
 
     private renderSendSmsCodeButton() {
+        const {smsCodeCountdown} = this.state;
+        const disabled = smsCodeCountdown > 0;
+        const backgroundColor = disabled ? '#eee' : '#0088FF';
+        const color = disabled ? '#888' : '#fff';
+
         return (
             <Button
                 style={{
-                    backgroundColor: '#0088FF',
+                    backgroundColor,
+                    color,
                     float: 'right',
                     marginTop: '10px',
-                    color: '#fff',
                     borderStyle: 'solid',
                     borderWidth: '1px',
                     borderRadius: '8px',
                     borderColor: '#eee'
                 }}
                 onClick={this.onSendSmsCodeButtonClick}
+                disabled={disabled}
             >
-                发送短信验证码
+                {disabled ? smsCodeCountdown + '秒后重新发送' : '发送短信验证码'}
             </Button>
         );
     }
@@ -209,6 +219,15 @@ class SignupPage extends React.Component<Props, State> {
         if (signupPhone === '') {
             return this.onError('！请输入手机号');
         }
+
+        if (!checkPhone(signupPhone)) {
+            return this.onError('！手机号格式不正确');
+        }
+
+        const COUNT_DOWN_SECONDS = 60;
+        countdown(COUNT_DOWN_SECONDS, (n: number) => {
+            this.setState({smsCodeCountdown: n});
+        });
 
         this.props.apiSmsCode({scene: 'SMS_SIGNUP', phone: signupPhone});
     }
