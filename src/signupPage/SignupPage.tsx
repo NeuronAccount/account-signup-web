@@ -37,10 +37,9 @@ class SignupPage extends React.Component<Props, State> {
             <div style={{width: '100%', height: '48px', backgroundColor: '#444'}}>
                 <label
                     style={{
-                        display: 'block',
                         textAlign: 'left',
                         color: '#FFF',
-                        fontSize: '200%',
+                        fontSize: '32px',
                         marginLeft: '8px'
                     }}
                 >
@@ -71,11 +70,7 @@ class SignupPage extends React.Component<Props, State> {
 
     public render() {
         return (
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
+            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 {SignupPage.renderTitle()}
                 {this.renderContent()}
             </div>
