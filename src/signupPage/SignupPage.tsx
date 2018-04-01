@@ -38,7 +38,7 @@ class SignupPage extends React.Component<Props, State> {
                 <label
                     style={{
                         textAlign: 'left',
-                        color: '#FFF',
+                        color: '#FF8800',
                         fontSize: '32px',
                         marginLeft: '8px'
                     }}
@@ -186,7 +186,7 @@ class SignupPage extends React.Component<Props, State> {
     private renderSendSmsCodeButton() {
         const {smsCodeCountdown} = this.state;
         const disabled = smsCodeCountdown > 0;
-        const backgroundColor = disabled ? '#eee' : '#0088FF';
+        const backgroundColor = disabled ? '#eee' : '#008888';
         const color = disabled ? '#888' : '#fff';
 
         return (
@@ -248,8 +248,8 @@ class SignupPage extends React.Component<Props, State> {
         return (
             <Button
                 style={{
-                    backgroundColor: '#0088FF',
-                    fontSize: '150%',
+                    backgroundColor: '#008888',
+                    fontSize: '24px',
                     color: '#fff',
                     width: '100%',
                     marginTop: '10px',
